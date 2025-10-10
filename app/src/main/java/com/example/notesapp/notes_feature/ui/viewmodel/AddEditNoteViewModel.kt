@@ -27,7 +27,6 @@ class AddEditNoteViewModel (
     val noteState = _noteState.asStateFlow()
     val noteHeaderState = TextFieldState()
     val noteBodyState = TextFieldState()
-    var hasNoteChanged = false
 
     fun createOrLoadNote(noteId: Int?) {
         if (noteId == null) {

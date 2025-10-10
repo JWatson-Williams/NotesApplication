@@ -16,19 +16,13 @@ import androidx.compose.ui.unit.dp
 import com.example.notesapp.notes_feature.data.room_db.NoteEntity
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.notesapp.R
 import com.example.notesapp.notes_feature.ui.views.util.Constants.LAZY_COLUMN_PADDING
-import com.example.notesapp.notes_feature.ui.views.util.Constants.iconButtonColors
 
 @Composable
 fun NotesOverview(
