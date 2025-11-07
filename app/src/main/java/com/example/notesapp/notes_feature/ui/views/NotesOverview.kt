@@ -28,7 +28,8 @@ import com.example.notesapp.notes_feature.ui.views.util.Constants.LAZY_COLUMN_PA
 fun NotesOverview(
     notes: List<NoteEntity>,
     loadNoteIntoVM: (Int) -> Unit,
-    createNewNote: () -> Unit
+    createNewNote: () -> Unit,
+    deleteNote: (NoteEntity) -> Unit
 ) {
     Box {
         LazyColumn(
@@ -40,7 +41,7 @@ fun NotesOverview(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             items(notes) { notes ->
-                NoteOverviewItem(notes, loadNoteIntoVM)
+                NoteOverviewItem(notes, loadNoteIntoVM, deleteNote)
             }
         }
 

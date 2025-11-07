@@ -23,21 +23,24 @@ class MainActivity : ComponentActivity() {
             "Hello",
             LOREN_IPSUM,
             Instant.now().toEpochMilli(),
-            Instant.now().toEpochMilli()
+            Instant.now().toEpochMilli(),
+            isSynced = true
         )
         val note2 = NoteEntity(
             2,
             "Goodbye",
             LOREN_IPSUM,
             Instant.now().toEpochMilli(),
-            Instant.now().toEpochMilli()
+            Instant.now().toEpochMilli(),
+            isSynced = true
         )
         val note3 = NoteEntity(
             3,
             "I'm here",
             LOREN_IPSUM,
             Instant.now().toEpochMilli(),
-            Instant.now().toEpochMilli()
+            Instant.now().toEpochMilli(),
+            isSynced = true
         )
 
         lifecycleScope.launch (Dispatchers.Default) {
@@ -49,17 +52,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             NotesAppTheme {
                 NavigationGraph(notesRepo)
-//                Box {
-//                    Note(
-//                        headerState = vm.noteHeaderState,
-//                        bodyState = vm.noteBodyState,
-//                        headerPlaceholder = headerPlaceHolder,
-//                        bodyPlaceholder = bodyPlaceHolder,
-//                        dateCreated = noteState.value.dateCreated,
-//                        dateModified = noteState.value.dateModified,
-//                        goBack = {}
-//                    )
-//                }
             }
         }
     }

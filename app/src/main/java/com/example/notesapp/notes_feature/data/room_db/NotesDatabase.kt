@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [NoteEntity::class], version = 1)
+@Database(entities = [NoteEntity::class], version = 3)
 @TypeConverters(Converters::class)
 abstract class NotesDatabase : RoomDatabase(){
     abstract fun NotesDao(): NotesDao
@@ -19,7 +19,7 @@ abstract class NotesDatabase : RoomDatabase(){
             return Room.databaseBuilder(
                 context,
                 NotesDatabase::class.java, "notes.db"
-            ).build()
+            ).fallbackToDestructiveMigration(true).build()
         }
 
         fun getDatabase(context: Context): NotesDatabase {

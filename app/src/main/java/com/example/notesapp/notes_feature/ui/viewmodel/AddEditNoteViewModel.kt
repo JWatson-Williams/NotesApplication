@@ -14,7 +14,7 @@ import timber.log.Timber
 import java.time.Instant
 
 data class NoteUiState(
-    val noteId: Int? = null,
+    val noteId: Int = 0,
     val dateCreated: Long = Instant.now().toEpochMilli(),
     val dateModified: Long = Instant.now().toEpochMilli(),
     val dateModifiedDisplayed: Boolean = true
@@ -96,7 +96,7 @@ class AddEditNoteViewModel (
                     )
                 )
             } catch (e: Exception) {
-                Timber.e(e, "Can't load note")
+                Timber.e(e, "Couldn't load note")
             }
         }
     }
@@ -116,7 +116,7 @@ class AddEditNoteViewModel (
                     )
                 )
             } catch (e: Exception) {
-                Timber.e(e, "Can't load note")
+                Timber.e(e, "Couldn't delete note")
             }
         }
     }

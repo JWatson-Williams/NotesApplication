@@ -12,4 +12,6 @@ interface NotesRepository {
     suspend fun getNoteById(noteId: Int): NoteEntity
 
     suspend fun deleteNote(note: NoteEntity): Int
+
+    suspend fun synchronizeNotes(dateLastModified: String)
 }

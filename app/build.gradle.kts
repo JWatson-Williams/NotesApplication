@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -43,6 +44,21 @@ android {
 }
 
 dependencies {
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.database)
+
+    //Hilt Implementation
+    implementation(libs.hilt)
+    ksp(libs.hilt.ksp)
+
+    //Room Implementation
+    implementation(libs.room)
+    ksp(libs.room.ksp)
+
+    //Logging
+    implementation(libs.timber)
 
     //Compose & Android Stuff
     implementation(libs.androidx.core.ktx)
@@ -67,14 +83,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //Hilt Implementation
-    implementation(libs.hilt)
-    ksp(libs.hilt.ksp)
-
-    //Room Implementation
-    implementation(libs.room)
-    ksp(libs.room.ksp)
-
-    //Logging
-    implementation(libs.timber)
 }

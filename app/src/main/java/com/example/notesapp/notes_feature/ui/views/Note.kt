@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.notesapp.R
+import com.example.notesapp.notes_feature.data.room_db.NoteEntity
 import com.example.notesapp.notes_feature.ui.views.util.Constants.bodyTextColors
 import com.example.notesapp.notes_feature.ui.views.util.Constants.BODY_TEXT_STYLE
 import com.example.notesapp.notes_feature.ui.views.util.Constants.headerColors
@@ -46,7 +49,8 @@ fun Note(
     displayDateModified: Boolean,
     onBackPress: () -> Unit,
     onTextChanged: () -> Unit,
-    changeDateShown: () -> Unit
+    changeDateShown: () -> Unit,
+    deleteNote: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         snapshotFlow { headerState.text.toString() to bodyState.text.toString() }
@@ -70,6 +74,7 @@ fun Note(
                 .padding(bottom = 10.dp),
             contentAlignment = Alignment.Center,
         ) {
+            //Back Button
             FilledIconButton(
                 onClick = onBackPress,
                 modifier = Modifier.align(Alignment.TopStart),
@@ -80,12 +85,26 @@ fun Note(
                     contentDescription = "Back Button"
                 )
             }
+
+
             DateDisplay(
                 displayDateModified = displayDateModified,
                 dateModified = dateModified,
                 dateCreated = dateCreated,
                 onClick =  changeDateShown
             )
+
+            IconButton(
+                onClick = deleteNote,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                ) {
+                Icon(
+                    painter = painterResource(R.drawable.outline_delete_24),
+                    contentDescription = "Delete Button",
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
 
         //Header

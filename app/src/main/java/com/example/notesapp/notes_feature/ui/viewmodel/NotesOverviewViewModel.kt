@@ -28,6 +28,13 @@ class NotesOverviewViewModel (
                     )
                 }
             }
+            notesRepository.synchronizeNotes(_overviewState.value.notesList.elementAt(0).dateModified.toString())
+        }
+    }
+
+    fun deleteNote(note: NoteEntity) {
+        viewModelScope.launch {
+            notesRepository.deleteNote(note)
         }
     }
 }

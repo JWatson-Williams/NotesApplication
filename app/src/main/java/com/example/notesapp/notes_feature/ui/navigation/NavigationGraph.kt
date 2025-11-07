@@ -50,6 +50,10 @@ fun NavigationGraph(notesRepository: NotesRepository) {
                             null
                         )
                     )
+                },
+                deleteNote = { note ->
+
+                    notesOverviewVM.deleteNote(note)
                 }
             )
         }
@@ -85,6 +89,10 @@ fun NavigationGraph(notesRepository: NotesRepository) {
                 },
                 changeDateShown = {
                     addEditNoteVM.changeDateShown()
+                },
+                deleteNote = {
+                    addEditNoteVM.deleteNoteFromDatabase()
+                    navController.popBackStack()
                 }
             )
         }
