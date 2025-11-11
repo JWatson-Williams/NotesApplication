@@ -14,4 +14,6 @@ interface NotesRepository {
     suspend fun deleteNote(note: NoteEntity): Int
 
     suspend fun synchronizeNotes(dateLastModified: String)
+
+    suspend fun pushUnsyncedNotesToFirebase()
 }

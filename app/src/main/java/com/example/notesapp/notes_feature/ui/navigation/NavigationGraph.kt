@@ -34,10 +34,13 @@ fun NavigationGraph(notesRepository: NotesRepository) {
             val notesOverviewState = notesOverviewVM.overviewState.collectAsState()
             val noteList = notesOverviewState.value.notesList
 
+            LaunchedEffect(notesOverviewState) {
+                notesRepository.pushUnsyncedNotesToFirebase()
+            }
+
             NotesOverview(
                 notes = noteList,
                 loadNoteIntoVM = { noteId ->
-
                     navController.navigate(
                         route = NavigationRoutes.NoteEditScreen(
                             noteId
@@ -52,7 +55,6 @@ fun NavigationGraph(notesRepository: NotesRepository) {
                     )
                 },
                 deleteNote = { note ->
-
                     notesOverviewVM.deleteNote(note)
                 }
             )
@@ -91,7 +93,7 @@ fun NavigationGraph(notesRepository: NotesRepository) {
                     addEditNoteVM.changeDateShown()
                 },
                 deleteNote = {
-                    addEditNoteVM.deleteNoteFromDatabase()
+                    addEditNoteVM.deleteNote()
                     navController.popBackStack()
                 }
             )

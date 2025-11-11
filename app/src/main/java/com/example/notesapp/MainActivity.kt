@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import com.example.notesapp.NotesApplication.Companion.appModule
 import com.example.notesapp.notes_feature.data.room_db.NoteEntity
 import com.example.notesapp.notes_feature.ui.navigation.NavigationGraph
 import com.example.notesapp.notes_feature.ui.views.util.Constants.LOREN_IPSUM
@@ -17,37 +18,37 @@ import java.time.Instant
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val notesRepo = NotesApplication.appModule.notesRepository
+        val notesRepo = appModule.notesRepository
+
         val note1 = NoteEntity(
             1,
             "Hello",
             LOREN_IPSUM,
-            Instant.now().toEpochMilli(),
-            Instant.now().toEpochMilli(),
-            isSynced = true
+            Instant.now().toEpochMilli().toString(),
+            Instant.now().toEpochMilli().toString(),
+            isSynced = false
         )
         val note2 = NoteEntity(
             2,
             "Goodbye",
             LOREN_IPSUM,
-            Instant.now().toEpochMilli(),
-            Instant.now().toEpochMilli(),
-            isSynced = true
+            Instant.now().toEpochMilli().toString(),
+            Instant.now().toEpochMilli().toString(),
+            isSynced = false
         )
         val note3 = NoteEntity(
             3,
             "I'm here",
             LOREN_IPSUM,
-            Instant.now().toEpochMilli(),
-            Instant.now().toEpochMilli(),
-            isSynced = true
+            Instant.now().toEpochMilli().toString(),
+            Instant.now().toEpochMilli().toString(),
+            isSynced = false
         )
 
-        lifecycleScope.launch (Dispatchers.Default) {
-            notesRepo.addOrUpdateNote(note1)
-            notesRepo.addOrUpdateNote(note2)
-            notesRepo.addOrUpdateNote(note3)
+        lifecycleScope.launch(Dispatchers.Default) {
+            notesRepo.synchronizeNotes("")
         }
+
         enableEdgeToEdge()
         setContent {
             NotesAppTheme {

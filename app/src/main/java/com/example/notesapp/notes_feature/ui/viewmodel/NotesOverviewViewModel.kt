@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 data class NoteOverviewViewUiState(
     val notesList: List<NoteEntity> = emptyList()
@@ -21,14 +22,27 @@ class NotesOverviewViewModel (
 
     init {
         viewModelScope.launch {
-            notesRepository.getALlNotes().collect { notes ->
-                _overviewState.update { it ->
-                    it.copy(
-                        notesList = notes
-                    )
+            Timber.d("Getting notes")
+            launch {
+                notesRepository.getALlNotes().collect { notes ->
+                    _overviewState.update { it ->
+                        it.copy(
+                            notesList = notes
+                        )
+                    }
                 }
             }
-            notesRepository.synchronizeNotes(_overviewState.value.notesList.elementAt(0).dateModified.toString())
+        }
+    }
+
+    fun synchronizeNotes(){
+        viewModelScope.launch {
+            try {
+                val dateModified = _overviewState.value.notesList.elementAtOrNull(0)?.dateModified
+                notesRepository.synchronizeNotes(dateModified.toString())
+            } catch (error: Exception) {
+                Timber.e(error, "Couldn't synchronize notes")
+            }
         }
     }
 

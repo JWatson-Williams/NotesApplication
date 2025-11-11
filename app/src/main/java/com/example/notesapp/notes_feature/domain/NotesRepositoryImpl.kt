@@ -1,5 +1,7 @@
 package com.example.notesapp.notes_feature.domain
 
+import com.example.notesapp.notes_feature.data.network.NetworkNoteModel
+import com.example.notesapp.notes_feature.data.network.asEntity
 import com.example.notesapp.notes_feature.data.repository.NotesRepository
 import com.example.notesapp.notes_feature.data.room_db.NoteEntity
 import com.example.notesapp.notes_feature.data.room_db.NotesDao
@@ -7,7 +9,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.getValue
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -17,7 +19,12 @@ class NotesRepositoryImpl (
     private val firebaseNotesList: DatabaseReference
 ) : NotesRepository {
     override suspend fun addOrUpdateNote(note: NoteEntity): Long {
-        val rowId = dao.upsertNote(note)
+        var rowId: Long
+        if(note.noteId == 0) {
+            rowId = dao.insertNote(note)
+        } else {
+            rowId = dao.upsertNote(note)
+        }
         if (rowId == (-1).toLong()) {
             Timber.d("Note Id \"%s\" successfully updated in room", note.noteId)
         } else {
@@ -56,41 +63,48 @@ class NotesRepositoryImpl (
     }
 
     override suspend fun synchronizeNotes(dateLastModified: String) = coroutineScope {
-        val modifiedNotesQuery = firebaseNotesList.orderByChild("date_modified").startAt(dateLastModified)
+        Timber.d("Synchronizing notes")
 
-        //Get the notes from firebase that were modified after the most recent note in the local database.
-        modifiedNotesQuery
+        val modifiedNotesQuery = firebaseNotesList.orderByChild("date_modified").startAt(dateLastModified)
+        //modifiedNotesQuery
+            firebaseNotesList
             .get()
             .addOnSuccessListener { modifiedNotes ->
-                val noteUpdates = modifiedNotes.getValue<List<NoteEntity>>()
+                Timber.d("%s", modifiedNotes.value)
+                val noteUpdates = modifiedNotes.getValue<HashMap<String, NetworkNoteModel>>()
 
-                if (!noteUpdates.isNullOrEmpty())
-                {
-                    if(noteUpdates.size > 1) {
-                        noteUpdates.forEach { note ->
-                            launch {
-                                //Try to insert the note into the room database (assumes this is a new note)
-                                val rowId = dao.insertNote(note)
+                //TODO: SEE IF I CAN CHANGE THIS BACK TO LAUNCH
+                runBlocking {
+                    Timber.d("NOTE UPDATES: %s", noteUpdates)
 
-                                //If insert didn't work, note already exists
-                                if (rowId == (-1).toLong()) {
-                                    dao.updateNoteIfNewer(
-                                        noteId = note.noteId,
-                                        noteHeader = note.noteHeader,
-                                        noteBody = note.noteBody,
-                                        dateModified = note.dateModified,
-                                        isSynced = note.isSynced
-                                    )
-                                }
+                    if (!noteUpdates.isNullOrEmpty())
+                    {
+                        Timber.d("List is not empty")
+                        if(noteUpdates.size > 1) {
+                            noteUpdates.forEach { unconvertedNote ->
+                                //launch {
+                                    if (unconvertedNote != null && unconvertedNote.value.noteId != 0) {
+                                        val note = unconvertedNote.value.asEntity()
+                                        //Try to insert the note into the room database (assumes this is a new note)
+                                        val rowId = dao.insertNote(note)
 
-                                //If update didn't work, the changes on the device are newer than the ones in the database. Push those changes
-                                val unsyncedNotes = dao.getUnsyncedNotes()
-                                unsyncedNotes.forEach { note ->
-                                    setFirebaseNoteValue(note)
-                                }
+                                        //If insert didn't work, note already exists
+                                        if (rowId == (-1).toLong()) {
+                                            dao.updateNoteIfNewer(
+                                                noteId = note.noteId,
+                                                noteHeader = note.noteHeader,
+                                                noteBody = note.noteBody,
+                                                dateModified = note.dateModified,
+                                                isSynced = note.isSynced
+                                            )
+                                        }
+                                    }
+                                //}
                             }
                         }
                     }
+
+                    pushUnsyncedNotesToFirebase()
                 }
             }
             .addOnFailureListener { errorBody ->
@@ -101,22 +115,33 @@ class NotesRepositoryImpl (
         Unit
     }
 
+    override suspend fun pushUnsyncedNotesToFirebase() {
+        Timber.d("Pushing unsynced notes to database")
+        val unsyncedNotes = dao.getUnsyncedNotes()
+        unsyncedNotes.forEach { note ->
+            Timber.d("%s, IS SYNCED: %s", note.noteId ,note.isSynced)
+            setFirebaseNoteValue(createSyncedNote(note))
+        }
+    }
+
     private suspend fun setFirebaseNoteValue(note: NoteEntity) = coroutineScope {
         firebaseNotesList.child(note.noteId.toString())
             .setValue(note)
             .addOnSuccessListener {
                 Timber.d("NoteId %s successfully updated on firebase", note.noteId)
-                launch {
-                    dao.upsertNote(
-                        createSyncedNote(note)
-                    )
+                if (note.noteId != 0) {
+                    //TODO: SEE IF I CAN CHANGE THIS BACK TO LAUNCH
+                    runBlocking {
+                        dao.updateNote(
+                            createSyncedNote(note)
+                        )
+                        Timber.d("NoteId %s: updated: %s", note.noteId, note.isSynced)
+                    }
                 }
             }
             .addOnFailureListener {
                 Timber.d("NoteId %s could not updated on firebase", note.noteId)
             }
-
-        Unit
     }
 
     private fun createSyncedNote(note: NoteEntity): NoteEntity {

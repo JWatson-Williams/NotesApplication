@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.notesapp.R
-import com.example.notesapp.notes_feature.data.room_db.NoteEntity
 import com.example.notesapp.notes_feature.ui.views.util.Constants.bodyTextColors
 import com.example.notesapp.notes_feature.ui.views.util.Constants.BODY_TEXT_STYLE
 import com.example.notesapp.notes_feature.ui.views.util.Constants.headerColors
@@ -44,8 +43,8 @@ fun Note(
     bodyState: TextFieldState,
     headerPlaceholder: @Composable () -> Unit,
     bodyPlaceholder: @Composable () -> Unit,
-    dateCreated: Long,
-    dateModified: Long,
+    dateCreated: String,
+    dateModified: String,
     displayDateModified: Boolean,
     onBackPress: () -> Unit,
     onTextChanged: () -> Unit,
@@ -132,7 +131,7 @@ fun Note(
 }
 
 @Composable
-fun DateDisplay(displayDateModified: Boolean, dateModified: Long, dateCreated: Long, onClick: () -> Unit) {
+fun DateDisplay(displayDateModified: Boolean, dateModified: String, dateCreated: String, onClick: () -> Unit) {
     Text(
         text =
             if (displayDateModified) {

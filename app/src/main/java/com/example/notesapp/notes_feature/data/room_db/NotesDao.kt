@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.IGNORE
+import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -19,6 +21,9 @@ interface NotesDao {
     @Upsert
     suspend fun upsertNote(note: NoteEntity): Long
 
+    @Update(onConflict = REPLACE)
+    suspend fun updateNote(note: NoteEntity)
+
     @Delete
     suspend fun deleteNote(note: NoteEntity): Int
 
@@ -30,7 +35,7 @@ interface NotesDao {
             "SET note_header = :noteHeader, note_body = :noteBody, date_modified = :dateModified, is_synced = :isSynced " +
             "WHERE note_id = :noteId AND :dateModified > date_modified"
     )
-    suspend fun updateNoteIfNewer(noteId: Int?, noteHeader: String?, noteBody: String?, dateModified: Long?, isSynced: Boolean): Int
+    suspend fun updateNoteIfNewer(noteId: Int?, noteHeader: String?, noteBody: String?, dateModified: String?, isSynced: Boolean): Int
 
     @Query("SELECT * FROM notes WHERE is_synced = 0")
     suspend fun getUnsyncedNotes(): List<NoteEntity>

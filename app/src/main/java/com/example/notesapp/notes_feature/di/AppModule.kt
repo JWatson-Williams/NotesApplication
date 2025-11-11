@@ -6,6 +6,8 @@ import com.example.notesapp.notes_feature.data.room_db.NotesDao
 import com.example.notesapp.notes_feature.data.room_db.NotesDatabase
 import com.example.notesapp.notes_feature.domain.NotesRepositoryImpl
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 
@@ -15,6 +17,7 @@ interface AppModule {
     val notesRepository: NotesRepository
     var firebaseDatabase: DatabaseReference
     var firebaseNotesList: DatabaseReference
+    val firebaseAuth: FirebaseAuth
 }
 
 class AppModuleImpl (
@@ -35,4 +38,6 @@ class AppModuleImpl (
     override val notesRepository: NotesRepository by lazy {
         NotesRepositoryImpl(notesDao, firebaseNotesList)
     }
+
+    override val firebaseAuth: FirebaseAuth = Firebase.auth
 }

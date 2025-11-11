@@ -15,9 +15,10 @@ import java.time.Instant
 
 data class NoteUiState(
     val noteId: Int = 0,
-    val dateCreated: Long = Instant.now().toEpochMilli(),
-    val dateModified: Long = Instant.now().toEpochMilli(),
-    val dateModifiedDisplayed: Boolean = true
+    val dateCreated: String = Instant.now().toEpochMilli().toString(),
+    val dateModified: String = Instant.now().toEpochMilli().toString(),
+    val dateModifiedDisplayed: Boolean = true,
+    val pushNoteUpdates: Boolean = false
 )
 
 class AddEditNoteViewModel (
@@ -67,17 +68,19 @@ class AddEditNoteViewModel (
         noteBodyState.setTextAndPlaceCursorAtEnd("")
         _noteState.update { it ->
             it.copy(
-                dateCreated = Instant.now().toEpochMilli(),
-                dateModified = Instant.now().toEpochMilli()
+                dateCreated = Instant.now().toEpochMilli().toString(),
+                dateModified = Instant.now().toEpochMilli().toString()
             )
         }
     }
 
     fun deleteOrUpdateNote(){
         if(noteHeaderState.text.isEmpty() && noteBodyState.text.isEmpty()) {
-            deleteNoteFromDatabase()
+            deleteNote()
         } else {
-            pushNoteUpdatesToDatabase()
+            if (_noteState.value.pushNoteUpdates) {
+                pushNoteUpdatesToDatabase()
+            }
         }
     }
 
@@ -101,7 +104,7 @@ class AddEditNoteViewModel (
         }
     }
 
-    fun deleteNoteFromDatabase() {
+    fun deleteNote() {
         val noteValue =  _noteState.value
 
         viewModelScope.launch {
@@ -124,7 +127,8 @@ class AddEditNoteViewModel (
     fun updateDateModified() {
         _noteState.update { it ->
             it.copy(
-                dateModified = Instant.now().toEpochMilli()
+                dateModified = Instant.now().toEpochMilli().toString(),
+                pushNoteUpdates = true
             )
         }
     }
