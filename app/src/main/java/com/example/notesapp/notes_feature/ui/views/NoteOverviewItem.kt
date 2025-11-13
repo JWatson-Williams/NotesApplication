@@ -24,15 +24,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.notesapp.R
-import com.example.notesapp.notes_feature.data.room_db.NoteEntity
 import com.example.notesapp.notes_feature.ui.views.util.Constants.NOTE_ITEM_PADDING
 import com.example.notesapp.notes_feature.ui.views.util.HelperMethods.formatEpochMilliForLocalTime
 
 @Composable
 fun NoteOverviewItem(
-    noteEntity: NoteEntity,
+    noteId: Int,
+    noteHeader: String?,
+    noteBody: String?,
+    dateModified: String,
     loadNoteIntoVM: (Int) -> Unit,
-    deleteNote: (NoteEntity) -> Unit
+    deleteNote: () -> Unit
     ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -44,7 +46,7 @@ fun NoteOverviewItem(
         .padding(NOTE_ITEM_PADDING)
         .clickable(
             onClick = {
-                loadNoteIntoVM(noteEntity.noteId)
+                loadNoteIntoVM(noteId)
             }
         )
     ) {
@@ -53,7 +55,7 @@ fun NoteOverviewItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             //Header
-            noteEntity.noteHeader?.let {
+            noteHeader?.let {
                 Text(
                     it,
                     style = MaterialTheme.typography.headlineLarge,
@@ -65,7 +67,7 @@ fun NoteOverviewItem(
             //Delete Button
             IconButton(
                 onClick = {
-                    deleteNote(noteEntity)
+                    deleteNote()
                 },
             ) {
                 Icon(
@@ -77,13 +79,13 @@ fun NoteOverviewItem(
 
         //Date
         Text(
-            text = formatEpochMilliForLocalTime(noteEntity.dateModified),
+            text = formatEpochMilliForLocalTime(dateModified),
             fontSize = 12.sp,
             modifier = Modifier.padding(bottom = 5.dp)
         )
 
         //Body
-        noteEntity.noteBody?.let {
+        noteBody?.let {
             Text(
                 it,
                 maxLines = 10,

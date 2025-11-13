@@ -70,7 +70,6 @@ class NotesRepositoryImpl (
             firebaseNotesList
             .get()
             .addOnSuccessListener { modifiedNotes ->
-                Timber.d("%s", modifiedNotes.value)
                 val noteUpdates = modifiedNotes.getValue<HashMap<String, NetworkNoteModel>>()
 
                 //TODO: SEE IF I CAN CHANGE THIS BACK TO LAUNCH
@@ -82,24 +81,23 @@ class NotesRepositoryImpl (
                         Timber.d("List is not empty")
                         if(noteUpdates.size > 1) {
                             noteUpdates.forEach { unconvertedNote ->
-                                //launch {
-                                    if (unconvertedNote != null && unconvertedNote.value.noteId != 0) {
-                                        val note = unconvertedNote.value.asEntity()
-                                        //Try to insert the note into the room database (assumes this is a new note)
-                                        val rowId = dao.insertNote(note)
+                                if (unconvertedNote != null && unconvertedNote.value.noteId != 0) {
+                                    val note = unconvertedNote.value.asEntity()
 
-                                        //If insert didn't work, note already exists
-                                        if (rowId == (-1).toLong()) {
-                                            dao.updateNoteIfNewer(
-                                                noteId = note.noteId,
-                                                noteHeader = note.noteHeader,
-                                                noteBody = note.noteBody,
-                                                dateModified = note.dateModified,
-                                                isSynced = note.isSynced
-                                            )
-                                        }
+                                    //Try to insert the note into the room database (assumes this is a new note)
+                                    val rowId = dao.insertNote(note)
+
+                                    //If insert didn't work, note already exists on device. Only update the note if the updates are newer than what's on the device
+                                    if (rowId == (-1).toLong()) {
+                                        dao.updateNoteIfNewer(
+                                            noteId = note.noteId,
+                                            noteHeader = note.noteHeader,
+                                            noteBody = note.noteBody,
+                                            dateModified = note.dateModified,
+                                            isSynced = note.isSynced
+                                        )
                                     }
-                                //}
+                                }
                             }
                         }
                     }

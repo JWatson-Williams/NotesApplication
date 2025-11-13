@@ -18,8 +18,11 @@ import com.example.notesapp.notes_feature.ui.views.util.Constants
 import timber.log.Timber
 
 @Composable
-fun NavigationGraph(notesRepository: NotesRepository) {
+fun NavigationGraph(
+    notesRepository: NotesRepository,
+) {
     val navController = rememberNavController()
+    var isFirstRun = true
 
     NavHost(
         navController = navController,
@@ -35,7 +38,10 @@ fun NavigationGraph(notesRepository: NotesRepository) {
             val noteList = notesOverviewState.value.notesList
 
             LaunchedEffect(notesOverviewState) {
-                notesRepository.pushUnsyncedNotesToFirebase()
+                if(!isFirstRun) {
+                    notesRepository.pushUnsyncedNotesToFirebase()
+                }
+                isFirstRun = false
             }
 
             NotesOverview(
@@ -56,6 +62,10 @@ fun NavigationGraph(notesRepository: NotesRepository) {
                 },
                 deleteNote = { note ->
                     notesOverviewVM.deleteNote(note)
+                },
+                isRefreshing = notesOverviewState.value.isRefreshing,
+                onRefresh = {
+                    notesOverviewVM.synchronizeNotes()
                 }
             )
         }

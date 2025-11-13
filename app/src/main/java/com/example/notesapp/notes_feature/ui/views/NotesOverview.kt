@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,9 +30,14 @@ fun NotesOverview(
     notes: List<NoteEntity>,
     loadNoteIntoVM: (Int) -> Unit,
     createNewNote: () -> Unit,
-    deleteNote: (NoteEntity) -> Unit
+    deleteNote: (NoteEntity) -> Unit,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit
 ) {
-    Box {
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -41,7 +47,16 @@ fun NotesOverview(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             items(notes) { notes ->
-                NoteOverviewItem(notes, loadNoteIntoVM, deleteNote)
+                NoteOverviewItem(
+                    noteId = notes.noteId,
+                    noteHeader = notes.noteHeader,
+                    noteBody = notes.noteBody,
+                    dateModified = notes.dateModified,
+                    loadNoteIntoVM = loadNoteIntoVM,
+                    deleteNote = {
+                        deleteNote(notes)
+                    }
+                )
             }
         }
 
